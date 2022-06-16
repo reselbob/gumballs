@@ -11,10 +11,6 @@ const createServer = (): express.Application => {
 
   app.disable('x-powered-by');
 
-  app.get('/health', (_req, res) => {
-    res.send('UP');
-  });
-
   app.get('/gumballs', (_req, res) => {
     const arr = new Array<Gumball>();
     arr.push(new Gumball(Color.Red, Flavor.Cherry));

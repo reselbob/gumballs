@@ -1,18 +1,10 @@
 import winston from 'winston';
 
 const LoggerWrapper = (): winston.Logger => {
-  const {combine, timestamp, printf, colorize} = winston.format;
+  const {combine, timestamp, prettyPrint, splat} = winston.format;
   return winston.createLogger({
     level: 'info',
-    format: combine(
-      colorize(),
-      timestamp(),
-      printf(info => {
-        return `${info.timestamp} [${info.level}] : ${JSON.stringify(
-          info.message
-        )}`;
-      })
-    ),
+    format: combine( timestamp(), prettyPrint(), splat()),
     transports: [new winston.transports.Console()],
     exitOnError: false,
   });
