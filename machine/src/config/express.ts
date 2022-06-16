@@ -1,7 +1,9 @@
 import express from 'express';
 import {logger} from './logger';
+import {Inventory} from '../resources/Inventory';
 
 import {Gumball, Color, Flavor} from '../resources/Gumball';
+//import {GumballBuyer} from '../resources/GumballBuyer';
 
 const createServer = (): express.Application => {
   const app = express();
@@ -19,10 +21,17 @@ const createServer = (): express.Application => {
     res.send(arr);
   });
 
-  app.get('/gumball', (_req, res) => {
-    const gumball: Gumball = new Gumball(Color.Red, Flavor.Cherry);
+  app.get('/gumball', async (_req, res) => {
+    const gumball = await Inventory.get();
     res.send(gumball);
   });
+  /*
+  app.get('/buygumball', async (_req, res) => {
+    const buyer: GumballBuyer = new GumballBuyer();
+    const data = await buyer.buy();
+    res.send(data);
+  });
+*/
 
   return app;
 };

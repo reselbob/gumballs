@@ -12,7 +12,7 @@ import http from 'http';
 import {logger} from './config/logger';
 
 const host = process.env.HOST || '0.0.0.0';
-const port = process.env.PORT || '5022';
+const port = process.env.PORT || '5023';
 
 async function startServer() {
   const app = createServer();
@@ -33,9 +33,6 @@ async function startServer() {
       });
     });
   });
-
-  return server;
 }
 
-module.exports = {startServer};
-startServer();
+startServer()
