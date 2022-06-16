@@ -1,4 +1,5 @@
 import express from 'express';
+import {logger} from './logger';
 
 import {Gumball, Color, Flavor} from '../resources/Gumball';
 
@@ -18,6 +19,7 @@ const createServer = (): express.Application => {
     const arr = new Array<Gumball>();
     arr.push(new Gumball(Color.Red, Flavor.Cherry));
     arr.push(new Gumball(Color.Green, Flavor.Spearmint));
+    logger.info(`sending ${JSON.stringify(arr)}`);
     res.send(arr);
   });
 
