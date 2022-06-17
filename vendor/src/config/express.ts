@@ -12,7 +12,7 @@ const createServer = (): express.Application => {
 
   app.get('/gumballs/:count', (_req, res) => {
     let cnt = 0;
-    if (isNumber(_req.params.count)) cnt = parseInt(_req.params.count);
+    if (isNumber(_req.params.count)) cnt = parseInt(_req.params.count, 10);
     const arr = new GumballFactory().getGumballs(cnt);
     logger.info(`sending some gumballs ${arr}`);
     res.send(arr);
@@ -20,15 +20,8 @@ const createServer = (): express.Application => {
   return app;
 };
 
-const isNumber = str => {
-  if (typeof str !== 'string') {
-    return false;
-  }
-
-  if (str.trim() === '') {
-    return false;
-  }
-
-  return !Number.isNaN(Number(str));
+const isNumber = function isNumber(value) {
+  return typeof value === 'number' && isFinite(value);
 };
+
 export {createServer};

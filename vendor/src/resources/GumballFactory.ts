@@ -3,11 +3,12 @@ export class GumballFactory {
   public catalog: Array<Gumball>;
 
   constructor() {
-    const arr = new Array<Gumball>();
-    arr.push(new Gumball(Color.Red, Flavor.Cherry));
-    arr.push(new Gumball(Color.Green, Flavor.Spearmint));
-    arr.push(new Gumball(Color.Yellow, Flavor.Lemon));
-    arr.push(new Gumball(Color.Clear, Flavor.Peppermint));
+    const arr = [
+      new Gumball(Color.Red, Flavor.Cherry),
+      new Gumball(Color.Green, Flavor.Spearmint),
+      new Gumball(Color.Yellow, Flavor.Lemon),
+      new Gumball(Color.Clear, Flavor.Peppermint),
+    ];
     this.catalog = arr;
   }
 

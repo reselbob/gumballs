@@ -1,11 +1,5 @@
 export class Gumball {
-  public color: Color;
-  public flavor: Flavor;
-
-  constructor(color: Color, flavor: Flavor) {
-    this.color = color;
-    this.flavor = flavor;
-  }
+  constructor(public color: Color, public flavor: Flavor) {}
 }
 
 export enum Flavor {
