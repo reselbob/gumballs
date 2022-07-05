@@ -1,5 +1,5 @@
 import {Gumball} from './Gumball';
-import {logger} from '../config/logger';
+import {logger} from '../logger';
 import {GumballBuyer} from './GumballBuyer';
 
 export class Inventory {

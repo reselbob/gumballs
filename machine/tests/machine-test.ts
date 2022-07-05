@@ -1,6 +1,6 @@
 import {expect} from 'chai';
 import {before, describe, it} from 'mocha';
-import {logger} from '../src/config/logger';
+import {logger} from '../src/logger';
 
 describe('Machine Test', () => {
   before(async () => {

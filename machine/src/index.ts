@@ -1,18 +1,36 @@
-import * as moduleAlias from 'module-alias';
-const sourcePath = process.env.NODE_ENV === 'development' ? 'src' : 'build';
-moduleAlias.addAliases({
-  '@server': sourcePath,
-  '@config': `${sourcePath}/config`,
-  '@domain': `${sourcePath}/domain`,
-});
-
-import {createServer} from './config/express';
 import {AddressInfo} from 'net';
 import http from 'http';
-import {logger} from './config/logger';
+import {logger} from './logger';
+import express from 'express';
+import {Color, Flavor, Gumball} from './resources/Gumball';
+import {Inventory} from './resources/Inventory';
 
 const host = process.env.HOST || '0.0.0.0';
 const port = process.env.PORT || '5022';
+
+const createServer = (): express.Application => {
+  const app = express();
+
+  app.use(express.urlencoded({extended: true}));
+  app.use(express.json());
+
+  app.disable('x-powered-by');
+
+  app.get('/gumballs', (_req, res) => {
+    const arr = new Array<Gumball>();
+    arr.push(new Gumball(Color.Red, Flavor.Cherry));
+    arr.push(new Gumball(Color.Green, Flavor.Spearmint));
+    logger.info(`sending ${JSON.stringify(arr)}`);
+    res.send(arr);
+  });
+
+  app.get('/gumball', async (_req, res) => {
+    const gumball = await Inventory.get();
+    res.send(gumball);
+  });
+
+  return app;
+};
 
 async function startServer() {
   const app = createServer();
