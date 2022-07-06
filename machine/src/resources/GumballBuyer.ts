@@ -14,7 +14,7 @@ export class GumballBuyer {
         console.log(response);
         return response.data;
       })
-      .catch(err => console.log(err));
+      .catch(err => logger.error(err));
     return Object.assign([], rslt);
   }
 }
