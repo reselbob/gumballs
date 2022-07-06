@@ -1,5 +1,5 @@
+// eslint-disable-next-line node/no-extraneous-import
 import {Worker} from '@temporalio/worker';
-import axios from 'axios';
 import {logger} from './logger';
 
 // @@@SNIPSTART typescript-activity-deps-worker
@@ -7,9 +7,9 @@ import {createActivities} from './activities';
 
 async function run() {
   const worker = await Worker.create({
-    taskQueue: 'dependency-injection',
+    taskQueue: 'gumball-buying',
     workflowsPath: require.resolve('./workflows'),
-    activities: createActivities(axios),
+    activities: createActivities(),
   });
 
   await worker.run();

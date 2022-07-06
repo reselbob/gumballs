@@ -20,9 +20,9 @@ export async function buyMoreWorkflow(): Promise<Array<Gumball>> {
   if (mStr.substr(mStr.length - 1) !== '/') {
     mStr = mStr + '/';
   }
-  const count = process.env.STANDING_ORDER_COUNT || 10;
-  const url = `${mStr}${count}`;
+  const quantity = process.env.STANDING_ORDER_COUNT || '10';
+  const url = mStr;
 
-  const gumballs = await buy(url);
+  const gumballs = await buy(url, parseInt(quantity, 10));
   return gumballs;
 }

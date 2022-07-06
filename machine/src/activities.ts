@@ -1,11 +1,17 @@
 import {Gumball} from './resources/Gumball';
 import {logger} from './logger';
-import {AxiosStatic} from 'axios';
+import axios from 'axios';
 
-export const createActivities = (wc: AxiosStatic) => ({
-  async buy(url: string): Promise<Array<Gumball>> {
-    logger.info(`Getting Gumballs from ${url}`);
-    const response = await wc.get(url);
-    return response.data as Array<Gumball>;
+export const createActivities = () => ({
+  async buy(supplierURL: string, quantity: number): Promise<Array<Gumball>> {
+    const url = `${supplierURL}/${quantity}`;
+    const result = await axios
+      .get(url)
+      .then(response => {
+        logger.info(response);
+        return response.data;
+      })
+      .catch(err => logger.error(err));
+    return Object.assign([], result);
   },
 });
