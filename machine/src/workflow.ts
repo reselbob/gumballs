@@ -1,28 +1,51 @@
 // eslint-disable-next-line node/no-extraneous-import
-import {proxyActivities} from '@temporalio/workflow';
-
-// @@@SNIPSTART typescript-activity-deps-workflow
+import * as wf from '@temporalio/workflow';
 import type {createActivities} from './activities';
-import {Gumball} from './resources/Gumball';
 
 // Note usage of ReturnType<> generic since createActivities is a factory function
-const {buy} = proxyActivities<ReturnType<typeof createActivities>>({
+const {buyGumballs} = wf.proxyActivities<ReturnType<typeof createActivities>>({
   startToCloseTimeout: '30 seconds',
 });
-// @@@SNIPEND
 
-export async function buyMoreWorkflow(): Promise<Array<Gumball>> {
-  const errMessage =
-    'The required environment variable SUPPLIER_URL does not exist or has no value.';
-  if (!process.env.SUPPLIER_URL) throw new Error(errMessage);
-  let mStr = process.env.SUPPLIER_URL;
-  //if the last character is not a /, add one
-  if (mStr.substr(mStr.length - 1) !== '/') {
-    mStr = mStr + '/';
+export interface Gumball {
+  color: string;
+  flavor: string;
+}
+
+export const numGumballsQuery = wf.defineQuery<number>('numGumballs');
+export const dispenseGumballSignal =
+  wf.defineSignal<[string]>('dispenseGumball');
+export const dispenseGumballQuery = wf.defineQuery<
+  Gumball | undefined,
+  [string]
+>('dispenseGumball');
+
+export async function gumballMachineWorkflow(
+  inventory = Array<Gumball>(),
+  requestIdToGumball = new Map<string, Gumball | undefined>()
+): Promise<void> {
+  wf.setHandler(numGumballsQuery, () => inventory.length);
+
+  wf.setHandler(dispenseGumballSignal, async requestId => {
+    //check if there's a gumball, if not buy some
+    await wf.condition(() => inventory.length !== 0);
+    const gumball = inventory.shift();
+    requestIdToGumball.set(requestId, gumball);
+  });
+  wf.setHandler(dispenseGumballQuery, requestId =>
+    requestIdToGumball.get(requestId)
+  );
+
+  function shouldBuyGumballs() {
+    return inventory.length === 0;
   }
-  const quantity = process.env.STANDING_ORDER_COUNT || '10';
-  const url = mStr;
 
-  const gumballs = await buy(url, parseInt(quantity, 10));
-  return gumballs;
+  while (wf.taskInfo().historyLength < 2000) {
+    await wf.condition(shouldBuyGumballs);
+    inventory.concat(await buyGumballs());
+  }
+  await wf.continueAsNew<typeof gumballMachineWorkflow>(
+    inventory,
+    requestIdToGumball
+  );
 }

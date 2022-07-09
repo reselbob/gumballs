@@ -1,17 +1,20 @@
-import {Gumball} from './resources/Gumball';
+//import * as activity from '@temporalio/activity';
+import {Gumball} from './workflow';
 import {logger} from './logger';
 import axios from 'axios';
 
-export const createActivities = () => ({
-  async buy(supplierURL: string, quantity: number): Promise<Array<Gumball>> {
-    const url = `${supplierURL}/${quantity}`;
-    const result = await axios
-      .get(url)
-      .then(response => {
+export const createActivities = (supplierURL: string, quantity: number) => {
+  return {
+    async buyGumballs(): Promise<Gumball[]> {
+      //const {workflowExecution, activityId} = activity.Context.current().info;
+      //const idempotencyToken = `${workflowExecution.workflowId}-${workflowExecution.runId}-${activityId}`;
+      // make http call to supplier and provide idempotencyToken so the Supplier is respecting
+      // this value as something akin to purchase order number // using idempotency token
+      const url = `${supplierURL}/${quantity}`;
+      return await axios.get(url).then(response => {
         logger.info(response);
         return response.data;
-      })
-      .catch(err => logger.error(err));
-    return Object.assign([], result);
-  },
-});
+      }); // Do not catch the error here, let it propagate
+    },
+  };
+}

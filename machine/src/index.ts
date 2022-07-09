@@ -3,12 +3,13 @@ import http from 'http';
 import {logger} from './logger';
 import express from 'express';
 import {Gumball} from './resources/Gumball';
+import {Config} from './config';
 
 const inventory = new Array<Gumball>();
 
 // eslint-disable-next-line node/no-extraneous-import
 import {WorkflowClient} from '@temporalio/client';
-import {buyMoreWorkflow} from './workflow';
+import {gumballMachineWorkflow} from './workflow';
 
 const client = new WorkflowClient();
 
@@ -17,8 +18,8 @@ const port = process.env.PORT || '5022';
 
 const loadMachine = async () => {
   logger.info('Buying gumballs');
-  const result = await client.execute(buyMoreWorkflow, {
-    taskQueue: 'gumball-buying',
+  const result = await client.execute(gumballMachineWorkflow, {
+    taskQueue: Config.queueName,
     workflowId: '1000',
   });
   const boughtGumballs = Object.assign([], result);
