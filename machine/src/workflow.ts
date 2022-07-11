@@ -1,16 +1,12 @@
 // eslint-disable-next-line node/no-extraneous-import
 import * as wf from '@temporalio/workflow';
 import type {createActivities} from './activities';
+import {Gumball} from './resources/Interfaces';
 
 // Note usage of ReturnType<> generic since createActivities is a factory function
 const {buyGumballs} = wf.proxyActivities<ReturnType<typeof createActivities>>({
   startToCloseTimeout: '30 seconds',
 });
-
-export interface Gumball {
-  color: string;
-  flavor: string;
-}
 
 export const numGumballsQuery = wf.defineQuery<number>('numGumballs');
 export const getGumballsQuery = wf.defineQuery<
