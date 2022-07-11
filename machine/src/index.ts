@@ -2,29 +2,37 @@ import {AddressInfo} from 'net';
 import http from 'http';
 import {logger} from './logger';
 import express from 'express';
-import {Gumball} from './resources/Gumball';
+//import {Gumball} from './resources/Gumball';
 import {Config} from './config';
+import {nanoid} from 'nanoid';
 
-const inventory = new Array<Gumball>();
+//const inventory = new Array<Gumball>();
 
 // eslint-disable-next-line node/no-extraneous-import
 import {WorkflowClient} from '@temporalio/client';
-import {gumballMachineWorkflow} from './workflow';
+import {
+  dispenseGumballQuery,
+  dispenseGumballSignal,
+  getGumballsQuery,
+  gumballMachineWorkflow,
+} from './workflow';
 
 const client = new WorkflowClient();
 
 const host = process.env.HOST || '0.0.0.0';
 const port = process.env.PORT || '5022';
+const workflowId = nanoid();
 
-const loadMachine = async () => {
+const connectToTemporalIo = async () => {
   logger.info('Buying gumballs');
-  const result = await client.execute(gumballMachineWorkflow, {
+  const result = await client.start(gumballMachineWorkflow, {
     taskQueue: Config.queueName,
-    workflowId: '1000',
+    workflowId: workflowId,
   });
-  const boughtGumballs = Object.assign([], result);
-  logger.info(`Received ${boughtGumballs.length} gumballs`);
-  inventory.concat(boughtGumballs);
+  //catch workflow started error
+  //const boughtGumballs = Object.assign([], result);
+  logger.info(`Connected to workflow ${result}`);
+  //inventory.concat(boughtGumballs);
 };
 
 const createServer = (): express.Application => {
@@ -34,15 +42,27 @@ const createServer = (): express.Application => {
   app.use(express.json());
 
   app.disable('x-powered-by');
-  app.get('/gumballs', (_req, res) => {
-    res.send(inventory);
+  app.get('/gumballs', async (_req, res) => {
+    try {
+      const handle = client.getHandle(workflowId);
+      const requestId = nanoid();
+      const gumballs = await handle.query(getGumballsQuery, requestId);
+      res.send(gumballs);
+    } catch (e) {
+      logger.error(e);
+    }
   });
 
   app.get('/gumball', async (_req, res) => {
-    if (inventory.length === 0) {
-      await loadMachine();
+    try {
+      const handle = client.getHandle(workflowId);
+      const requestId = nanoid();
+      await handle.signal(dispenseGumballSignal, requestId);
+      const gumball = await handle.query(dispenseGumballQuery, requestId);
+      res.send(gumball);
+    } catch (e) {
+      logger.error(e);
     }
-    res.send(inventory.shift());
   });
 
   return app;
@@ -52,11 +72,15 @@ async function startServer() {
   const app = createServer();
   const server = http.createServer(app).listen({host, port}, () => {
     const addressInfo = server.address() as AddressInfo;
-    loadMachine().then(() => {
-      logger.info(
-        `Gumball machine is ready at http://${addressInfo.address}:${addressInfo.port}`
-      );
-    });
+    connectToTemporalIo()
+      .then(() => {
+        logger.info(
+          `Gumball machine is ready at http://${addressInfo.address}:${addressInfo.port}`
+        );
+      })
+      .catch(e => {
+        logger.error(e);
+      });
   });
 
   const signalTraps: NodeJS.Signals[] = ['SIGTERM', 'SIGINT', 'SIGUSR2'];
@@ -72,5 +96,4 @@ async function startServer() {
 
   return server;
 }
-module.exports = {startServer};
-startServer();
+startServer().then(() => logger.info('startServer called'));

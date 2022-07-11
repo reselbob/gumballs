@@ -13,8 +13,14 @@ export interface Gumball {
 }
 
 export const numGumballsQuery = wf.defineQuery<number>('numGumballs');
+export const getGumballsQuery = wf.defineQuery<
+  Array<Gumball>,
+  [string] | undefined
+>('getGumballs');
+
 export const dispenseGumballSignal =
   wf.defineSignal<[string]>('dispenseGumball');
+
 export const dispenseGumballQuery = wf.defineQuery<
   Gumball | undefined,
   [string]
@@ -32,9 +38,12 @@ export async function gumballMachineWorkflow(
     const gumball = inventory.shift();
     requestIdToGumball.set(requestId, gumball);
   });
+
   wf.setHandler(dispenseGumballQuery, requestId =>
     requestIdToGumball.get(requestId)
   );
+
+  wf.setHandler(getGumballsQuery, requestId => inventory);
 
   function shouldBuyGumballs() {
     return inventory.length === 0;
