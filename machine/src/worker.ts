@@ -2,6 +2,7 @@
 import {Worker} from '@temporalio/worker';
 import {logger} from './logger';
 import {Config} from './config';
+import 'dotenv/config';
 
 import {createActivities} from './activities';
 
@@ -23,15 +24,16 @@ async function run() {
 
   const worker = await Worker.create({
     taskQueue: Config.queueName,
-    workflowsPath: require.resolve('./workflows'),
+    workflowsPath: require.resolve('./workflow'),
     activities: createActivities(url, parseInt(quantity)),
   });
 
   await worker.run();
 }
 
-run().catch(err => {
-  logger.error(err);
+run().catch(e => {
+  const err = e as Error;
+  logger.error(err.message);
   // eslint-disable-next-line no-process-exit
   process.exit(1);
 });

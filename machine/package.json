@@ -20,7 +20,7 @@
     "posttest": "npm run lint",
     "start": "ts-node src/worker.ts",
     "start.watch": "nodemon src/worker.ts",
-    "workflow": "ts-node src/indes.ts"
+    "workflow": "ts-node src/index.ts"
   },
   "devDependencies": {
     "@types/axios": "^0.14.0",

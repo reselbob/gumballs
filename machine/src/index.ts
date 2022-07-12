@@ -6,6 +6,8 @@ import express from 'express';
 import {Config} from './config';
 import {nanoid} from 'nanoid';
 
+import 'dotenv/config';
+
 //const inventory = new Array<Gumball>();
 
 // eslint-disable-next-line node/no-extraneous-import
@@ -49,7 +51,8 @@ const createServer = (): express.Application => {
       const gumballs = await handle.query(getGumballsQuery, requestId);
       res.send(gumballs);
     } catch (e) {
-      logger.error(e);
+      const err = e as Error;
+      logger.error(err.message);
     }
   });
 
@@ -61,7 +64,8 @@ const createServer = (): express.Application => {
       const gumball = await handle.query(dispenseGumballQuery, requestId);
       res.send(gumball);
     } catch (e) {
-      logger.error(e);
+      const err = e as Error;
+      logger.error(err.message);
     }
   });
 
@@ -79,7 +83,8 @@ async function startServer() {
         );
       })
       .catch(e => {
-        logger.error(e);
+        const err = e as Error;
+        logger.error(err.message);
       });
   });
 

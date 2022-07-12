@@ -21,7 +21,7 @@ const createServer = (): express.Application => {
 };
 
 const isNumber = function isNumber(value) {
-  return typeof value === 'number' && isFinite(value);
+  return !isNaN(value);
 };
 
 export {createServer};
