@@ -1,12 +1,21 @@
 // eslint-disable-next-line node/no-extraneous-import
-import {Worker} from '@temporalio/worker';
+import {Worker, InjectedSinks} from '@temporalio/worker';
+import {LoggerSinks} from './resources/Interfaces';
 import {logger} from './logger';
 import {Config} from './config';
 import 'dotenv/config';
-
 import {createActivities} from './activities';
-
 async function run() {
+  const sinks: InjectedSinks<LoggerSinks> = {
+    logger: {
+      info: {
+        fn(workflowInfo, message) {
+          console.log('workflow: ', workflowInfo.runId, 'message: ', message);
+        },
+        callDuringReplay: false, // The default
+      },
+    },
+  };
   const errMessage =
     'The required environment variable SUPPLIER_URL does not exist or has no value.';
   if (!process.env.SUPPLIER_URL) throw new Error(errMessage);
@@ -22,13 +31,16 @@ async function run() {
     throw new Error(errMsg);
   }
 
+  logger.info('Creating worker');
   const worker = await Worker.create({
     taskQueue: Config.queueName,
     workflowsPath: require.resolve('./workflow'),
     activities: createActivities(url, parseInt(quantity)),
+    sinks,
   });
 
   await worker.run();
+  logger.info('Worker gracefully shutdown');
 }
 
 run().catch(e => {

@@ -2,7 +2,8 @@
 import * as wf from '@temporalio/workflow';
 import type {createActivities} from './activities';
 import {Gumball} from './resources/Interfaces';
-import {logger} from './logger';
+import {LoggerSinks} from './resources/Interfaces';
+const {logger} = wf.proxySinks<LoggerSinks>();
 
 // Note usage of ReturnType<> generic since createActivities is a factory function
 const {buyGumballs} = wf.proxyActivities<ReturnType<typeof createActivities>>({
@@ -50,6 +51,9 @@ export async function gumballMachineWorkflow(
   wf.setHandler(getGumballsQuery, requestId => inventory);
 
   function shouldBuyGumballs() {
+    logger.info(
+      `The current number of gumballs in stock is ${inventory.length}`
+    );
     return inventory.length === 0;
   }
 
