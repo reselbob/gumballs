@@ -59,7 +59,13 @@ export async function gumballMachineWorkflow(
 
   while (wf.taskInfo().historyLength < 2000) {
     await wf.condition(shouldBuyGumballs);
-    inventory.concat(await buyGumballs());
+    logger.info('Getting gumballs in because inventory has gone to zero');
+    const gbs = await buyGumballs();
+    logger.info('Filling gumballs inventory');
+    gbs.forEach(gb => {
+      inventory.push(gb);
+    });
+    logger.info('Filled gumballs inventory');
   }
   await wf.continueAsNew<typeof gumballMachineWorkflow>(
     inventory,

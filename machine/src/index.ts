@@ -8,8 +8,6 @@ import {nanoid} from 'nanoid';
 
 import 'dotenv/config';
 
-//const inventory = new Array<Gumball>();
-
 // eslint-disable-next-line node/no-extraneous-import
 import {WorkflowClient} from '@temporalio/client';
 import {
@@ -21,7 +19,7 @@ import {
 
 const client = new WorkflowClient();
 
-const host = process.env.HOST || '0.0.0.0';
+const host = process.env.HOST || '127.0.0.1';
 const port = process.env.PORT || '5022';
 const workflowId = nanoid();
 
@@ -31,10 +29,7 @@ const connectToTemporalIo = async () => {
     taskQueue: Config.queueName,
     workflowId: workflowId,
   });
-  //catch workflow started error
-  //const boughtGumballs = Object.assign([], result);
-  logger.info(`Connected to workflow ${result}`);
-  //inventory.concat(boughtGumballs);
+  logger.info(`Connected to workflow ${JSON.stringify(result)}`);
 };
 
 const createServer = (): express.Application => {
@@ -50,6 +45,18 @@ const createServer = (): express.Application => {
       const requestId = nanoid();
       const gumballs = await handle.query(getGumballsQuery, requestId);
       res.send(gumballs);
+    } catch (e) {
+      const err = e as Error;
+      logger.error(err.message);
+    }
+  });
+
+  app.get('/gumballs/quantity', async (_req, res) => {
+    try {
+      const handle = client.getHandle(workflowId);
+      const requestId = nanoid();
+      const gumballs = await handle.query(getGumballsQuery, requestId);
+      res.send({quantity: gumballs.length});
     } catch (e) {
       const err = e as Error;
       logger.error(err.message);
