@@ -13,7 +13,7 @@ Get the Temporal.io Server and run it using Docker Compose
 
 or, if you have the later version of Docker Desktop installed
 
-`cd docker-compose && docker-compose up -d`
+`cd docker-compose && docker compose up -d`
 
 ## Installing the Gumball Supplier API
 
