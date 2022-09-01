@@ -6,10 +6,6 @@ import axios from 'axios';
 export const createActivities = (supplierURL: string, quantity: number) => {
   return {
     async buyGumballs(): Promise<Gumball[]> {
-      //const {workflowExecution, activityId} = activity.Context.current().info;
-      //const idempotencyToken = `${workflowExecution.workflowId}-${workflowExecution.runId}-${activityId}`;
-      // make http call to supplier and provide idempotencyToken so the Supplier is respecting
-      // this value as something akin to purchase order number // using idempotency token
       let strUrl = supplierURL;
       if (strUrl.substring(strUrl.length - 1) !== '/') {
         strUrl = strUrl + '/';

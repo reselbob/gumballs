@@ -2,7 +2,6 @@ import {AddressInfo} from 'net';
 import http from 'http';
 import {logger} from './logger';
 import express from 'express';
-//import {Gumball} from './resources/Gumball';
 import {Config} from './config';
 import {nanoid} from 'nanoid';
 
@@ -53,8 +52,10 @@ const createServer = (): express.Application => {
 
   app.get('/gumballs/quantity', async (_req, res) => {
     try {
+      // get workflowId from config
       const handle = client.getHandle(workflowId);
       const requestId = nanoid();
+      //Calls the cluster
       const gumballs = await handle.query(getGumballsQuery, requestId);
       res.send({quantity: gumballs.length});
     } catch (e) {

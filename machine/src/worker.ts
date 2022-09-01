@@ -25,7 +25,7 @@ async function run() {
     mStr = mStr + '/';
   }
   const quantity = process.env.STANDING_ORDER_COUNT || '10';
-  const url = mStr;
+  const supplierUrl = mStr;
   if (!isNumber(quantity)) {
     const errMsg = `The value ${quantity} is not a number`;
     throw new Error(errMsg);
@@ -35,7 +35,7 @@ async function run() {
   const worker = await Worker.create({
     taskQueue: Config.queueName,
     workflowsPath: require.resolve('./workflow'),
-    activities: createActivities(url, parseInt(quantity)),
+    activities: createActivities(supplierUrl, parseInt(quantity)),
     sinks,
   });
 
