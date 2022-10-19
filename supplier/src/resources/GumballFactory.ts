@@ -12,9 +12,9 @@ export class GumballFactory {
     this.catalog = arr;
   }
 
-  public getGumballs(count: number): Array<Gumball> {
+  public getGumballs(quantity: number): Array<Gumball> {
     const arr = new Array<Gumball>();
-    for (let i = 0; i < count; i++) {
+    for (let i = 0; i < quantity; i++) {
       arr.push(this.getRandomGumball());
     }
     return arr;

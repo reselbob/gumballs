@@ -11,7 +11,7 @@ import {AddressInfo} from 'net';
 import http from 'http';
 import {logger} from './config/logger';
 
-const host = process.env.HOST || '0.0.0.0';
+const host = process.env.HOST || '127.0.0.1';
 const port = process.env.PORT || '5023';
 
 async function startServer() {
