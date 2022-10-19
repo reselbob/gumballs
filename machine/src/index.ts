@@ -1,4 +1,4 @@
-.import {AddressInfo} from 'net';
+import {AddressInfo} from 'net';
 import http from 'http';
 import {logger} from './logger';
 import express from 'express';
