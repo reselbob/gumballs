@@ -1,6 +1,7 @@
 # gumballs
 A project demonstrates how to use Temporal.io durable workflow technology to emulate a IoT scenario designed with the Actor pattern. The project emulates a Gumball machine that disburses a gumball on demand. And, when the supply of gumballs in the machine runs low, the workflow code replenishes the gumballs in the machine from a supplier located at an external website.
 
+![basic-architecture](https://user-images.githubusercontent.com/1110569/196825286-48e9149e-d328-4640-b7f8-89ceef0e63ad.png)
 
 
 | Take the interactive tutorial|
